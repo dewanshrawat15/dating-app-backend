@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from .models import Profile
+from .models import Profile, MatchObj
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -42,3 +42,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 			'image_url_six',
 			'username'
 		]
+
+class MatchSerializer(serializers.ModelSerializer):
+
+	def create(self, validated_data):
+		match = MatchObj.objects.create(validated_data)
+		return match
+
+	class Meta:
+		model = MatchObj
+		fields = ['user_one', 'user_two', 'user_one_auth', 'user_two_auth']

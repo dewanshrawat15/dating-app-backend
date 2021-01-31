@@ -35,21 +35,28 @@ class ImageView(APIView):
 	def post(self, request):
 		try:
 			file_uploaded = request.FILES.get('user_image')
-			content_type = file_uploaded.content_type
+			associate_image_key = ''
+			image_uploaded = False
 			username = request.user.username
-			user_photo = UserPhoto.objects.create(photo=file_uploaded, username=username)
 			profile = Profile.objects.get(username=username)
 			images_map = profile.getImagesMap()
-			associate_image_key = ''
 			for key in images_map:
 				if len(images_map[key]) == 0:
 					associate_image_key = key
+					image_uploaded = True
 					break
-			profile.putImageField(associate_image_key, user_photo.photo.url)
-			return Response({
-				"error": False,
-				"message": 'Successful'
-			}, status=status.HTTP_201_CREATED)
+			if image_uploaded:
+				user_photo = UserPhoto.objects.create(photo=file_uploaded, username=username)
+				profile.putImageField(associate_image_key, user_photo.photo.url)
+				return Response({
+					"error": False,
+					"message": 'Successful'
+				}, status=status.HTTP_201_CREATED)
+			else:
+				return Response({
+					"error": False,
+					"message": 'Number of images that can be uploaded have exceeded'
+				}, status=status.HTTP_200_OK)
 		except Exception as e:
 			return Response({
 				"error": True,
