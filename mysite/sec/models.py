@@ -63,10 +63,11 @@ class MatchObj(models.Model):
 	user_two = models.CharField(max_length=256)
 	user_one_auth = models.BooleanField(blank=True)
 	user_two_auth = models.BooleanField(blank=True)
-	user_one_consensus = models.BooleanField(blank=True, default=False)
-	user_two_consensus = models.BooleanField(blank=True, default=False)
+	user_one_consensus = models.CharField(max_length=6, blank=True)
+	user_two_consensus = models.CharField(max_length=6, blank=True)
 
 	def __str__(self):
 		string = self.user_one + " " + self.user_two
 		return str(hash(string))
+
 

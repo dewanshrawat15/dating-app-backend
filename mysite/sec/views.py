@@ -42,11 +42,20 @@ class MatchAPI(APIView):
 			host = request.get_host()
 			username = request.user.username
 			profiles = Profile.objects.all()
+			matches = MatchObj.objects.filter(Q(user_one=username) | Q(user_two=username))
+			users_not_to_show = []
+			for i in matches:
+				if len(str(i.user_two_consensus)) > 0:
+					users_not_to_show.append(i.user_two)
 			details = []
 			for i in profiles:
 				profile_data = i.getProfileDetails(host)
 				if profile_data['username'] != username:
 					details.append(profile_data)
+			for idx in range(len(details)):
+				for blacklister in users_not_to_show:
+					if details[idx]['username'] == blacklister:
+						details.pop(idx)
 			return Response({
 				"error": False,
 				"profiles": details
@@ -64,21 +73,21 @@ class MatchAPI(APIView):
 		if user_one == request.user.username or user_two == request.user.username:
 			find_match = MatchObj.objects.filter(Q(user_one=user_one, user_two=user_two) | Q(user_one=user_two, user_two=user_one))
 			if len(find_match) <= 0:
-				match = MatchObj.objects.create(user_one=user_one, user_two=user_two, user_one_auth=False, user_two_auth=False, user_one_consensus=False, user_two_consensus=False)
+				match = MatchObj.objects.create(user_one=user_one, user_two=user_two, user_one_auth=False, user_two_auth=False, user_one_consensus='', user_two_consensus='')
 				if request.user.username == user_one:
-					match.user_one_auth = True
+					match.user_one_auth = "True"
 					if vote:
-						match.user_one_consensus = True
+						match.user_one_consensus = "True"
 					else:
-						match.user_one_consensus = False
+						match.user_one_consensus = "False"
 			else:
 				match = MatchObj.objects.get(user_one=user_two, user_two=user_one)
 				if request.user.username == user_one:
-					match.user_two_auth = True
+					match.user_two_auth = "True"
 					if vote:
-						match.user_two_consensus = True
+						match.user_two_consensus = "True"
 					else:
-						match.user_two_consensus = False
+						match.user_two_consensus = "False"
 			match.save()
 			return Response({
 				"error": False,
