@@ -54,7 +54,7 @@ class ImageView(APIView):
 				}, status=status.HTTP_201_CREATED)
 			else:
 				return Response({
-					"error": False,
+					"error": True,
 					"message": 'Number of images that can be uploaded have exceeded'
 				}, status=status.HTTP_200_OK)
 		except Exception as e:

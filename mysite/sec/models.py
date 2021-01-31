@@ -13,6 +13,24 @@ class Profile(models.Model):
 	def __str__(self):
 		return self.username
 
+	def getProfileDetails(self, host):
+		data = {
+			"username": self.username,
+			"image_url_one": self.getImageUrl(host, self.image_url_one),
+			"image_url_two": self.getImageUrl(host, self.image_url_two),
+			"image_url_three": self.getImageUrl(host, self.image_url_three),
+			"image_url_four": self.getImageUrl(host, self.image_url_four),
+			"image_url_five": self.getImageUrl(host, self.image_url_five),
+			"image_url_six": self.getImageUrl(host, self.image_url_six)
+		}
+		return data
+
+	def getImageUrl(self, host, img_rel_path):
+		if len(img_rel_path) > 0:
+			url = 'http://' + host + img_rel_path
+			return url
+		return ''
+
 	def getImagesMap(self):
 		data = {
 			"image_url_one": self.image_url_one,

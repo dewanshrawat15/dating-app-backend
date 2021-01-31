@@ -17,7 +17,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from sec.views import UserRegisterApiView, CreateMatchAPI
+from sec.views import UserRegisterApiView, MatchAPI
 from photos.views import ImageView
 from rest_framework.authtoken import views
 
@@ -26,7 +26,7 @@ urlpatterns = [
     path('user/register/', UserRegisterApiView.as_view(), name='users_register'),
     path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
     path('photos/', ImageView.as_view(), name='photos-api'),
-    path('match/', CreateMatchAPI.as_view(), name='match-api')
+    path('match/', MatchAPI.as_view(), name='match-api')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

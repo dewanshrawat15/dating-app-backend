@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import UserSerializer, MatchSerializer
+from .serializers import UserSerializer, MatchSerializer, ProfileSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -32,10 +32,30 @@ class UserRegisterApiView(APIView):
 		}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreateMatchAPI(APIView):
+class MatchAPI(APIView):
 
 	permission_classes = [IsAuthenticated]
 	serializer_class = MatchSerializer
+
+	def get(self, request):
+		if request.user.is_authenticated:
+			host = request.get_host()
+			username = request.user.username
+			profiles = Profile.objects.all()
+			details = []
+			for i in profiles:
+				profile_data = i.getProfileDetails(host)
+				if profile_data['username'] != username:
+					details.append(profile_data)
+			return Response({
+				"error": False,
+				"profiles": details
+			}, status=status.HTTP_200_OK)
+		else:
+			return Response({
+				"error": True,
+				"message": "Unauthorized."
+			}, status=status.HTTP_401_UNAUTHORIZED)
 
 	def post(self, request):
 		user_one = request.data['user_one']
