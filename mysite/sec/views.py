@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from .models import Profile, MatchObj
 from django.db.models import Q
 
-
 class UserRegisterApiView(APIView):
 
 	permission_classes = [AllowAny]
@@ -21,9 +20,13 @@ class UserRegisterApiView(APIView):
 		return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 	def post(self, request):
-		serializer = UserSerializer(data=request.data)
+		user_data = dict(request.data)
+		for key in user_data:
+			if isinstance(user_data[key], list):
+				user_data[key] = user_data[key][0]
+		serializer = UserSerializer(data=user_data)
 		if serializer.is_valid(raise_exception=ValueError):
-			serializer.create(validated_data=request.data)
+			serializer.create(validated_data=user_data)
 			Profile.objects.create(username=request.data['username'])
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response({
